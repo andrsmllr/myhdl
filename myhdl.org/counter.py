@@ -15,12 +15,12 @@ def counter(clk, rst, count, WIDTH):
 
     #count = modbv(0)[WIDTH:] # Local count variable not required, given as parameter.
 
-    @always(clk.posedge, rst.posedge)
+    @always(clk.posedge)
     def incrCount():
         if rst:
             count.next = 0
         else:
-            count.next += 1
+            count.next = count + 1
 
     return incrCount
 
@@ -59,5 +59,13 @@ def counter_tb(WIDTH):
     return counter_dut, clock, stimulus, monitor
 
 
+# Convert counter to HDL.
+WIDTH = 4
+clk = Signal(bool(0))
+rst = Signal(bool(0))
+count = Signal(modbv(0)[WIDTH:])
+counter_inst = toVHDL(counter, clk, rst, count, WIDTH)
+
+# Run simulation.
 sim = Simulation(counter_tb(4))
 sim.run(800)
