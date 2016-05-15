@@ -1,9 +1,19 @@
+#!/bin/python
+#
+# File: helloworld.py
+# Date: 2016-04-02
+# Author: Andreas Mueller
+#
+# Description: Helloworld examples in MyHDL.
+#
+
+from sys import argv, exit
 from myhdl import Signal, delay, instance, always, now, Simulation, toVHDL
 
 def ClkDriver(clk):
     """A clock driver."""
 
-    halfPeriod = delay(10)
+    halfPeriod = delay(5)
 
     @always(halfPeriod)
     def driveClk():
@@ -12,14 +22,15 @@ def ClkDriver(clk):
     return driveClk
 
 
-def GenericClkDriver(clk, period=20):
-    """A generic clock driver."""
+def GenericClkDriver(clk, period=10):
+    """A generic clock driver with configurable period."""
 
     lowTime = int(period/2)
     highTime = period - lowTime
 
     @instance
     def driveClk():
+        clk.next = 0
         while True:
             yield delay(lowTime)
             clk.next = 1
@@ -63,18 +74,28 @@ def greetings():
     return [clkdriver1, clkdriver2, hello1, hello2]
 
 
-clk1 = Signal(bool(0))
-clkdriver_inst1 = ClkDriver(clk1)
-helloworld_inst1 = HelloWorld(clk1)
-sim1 = Simulation(clkdriver_inst1, helloworld_inst1)
-sim1.run(50)
+if __name__ == "__main__":
 
-clk2 = Signal(0)
-clkdriver_inst2 = GenericClkDriver(clk2)
-helloworld_inst2 = GenericHello(clk2, "you there")
-sim2 = Simulation(clkdriver_inst2, helloworld_inst2)
-sim2.run(50)
+  if len(argv) < 2:
+    print("Usage: python helloworld.py {1,2,3}")
+    exit()
 
-greet = greetings()
-sim3 = Simulation(greet)
-sim3.run(50)
+  # The following conditional is required to avoid "Only one simulation instance
+  # allowed" errors from MyHDL.
+  if argv[1] ==  "1":
+    clk1 = Signal(bool(0))
+    clkdriver_inst1 = ClkDriver(clk1)
+    helloworld_inst1 = HelloWorld(clk1)
+    sim1 = Simulation(clkdriver_inst1, helloworld_inst1)
+    sim1.run(50)
+  elif argv[1] == "2":
+    clk2 = Signal(0)
+    clkdriver_inst2 = GenericClkDriver(clk2)
+    helloworld_inst2 = GenericHello(clk2, "you there")
+    sim2 = Simulation(clkdriver_inst2, helloworld_inst2)
+    sim2.run(50)
+  elif argv[1] == "3":
+    greet = greetings()
+    sim3 = Simulation(greet)
+    sim3.run(50)
+
