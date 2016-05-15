@@ -20,6 +20,22 @@ def bin2gray(bin_i, gray_o, WIDTH):
     return logic
 
 
+# Dummy module defining the interface used during unit testing.
+def bin2gray_dummy(B, G, width):
+  """NOT IMPLEMENTED YET."""
+  yield None
+
+
+# Incorrect implementation for unit testing demo.
+def bin2gray_incorrect(B, G, width):
+  """INCORRECT, DEMO ONLY."""
+  @always_comb
+  def logic():
+    G.next = B[0]
+
+  return logic
+
+
 def bin2gray_tb(WIDTH):
     """Testbench for bin2gray."""
 
@@ -37,6 +53,6 @@ def bin2gray_tb(WIDTH):
 
     return bin2gray_dut, stimulus
 
-
-sim = Simulation(bin2gray_tb(WIDTH=3))
-sim.run()
+if __name__ == "__main__":
+  sim = Simulation(bin2gray_tb(WIDTH=3))
+  sim.run()
